@@ -31,6 +31,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addDebuggerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setAsDebuggerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -47,6 +48,7 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setAsDebuggerToolStripMenuItem,
             this.addDebuggerToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -55,9 +57,16 @@
             // addDebuggerToolStripMenuItem
             // 
             this.addDebuggerToolStripMenuItem.Name = "addDebuggerToolStripMenuItem";
-            this.addDebuggerToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.addDebuggerToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.addDebuggerToolStripMenuItem.Text = "Add Debugger";
             this.addDebuggerToolStripMenuItem.Click += new System.EventHandler(this.addDebuggerToolStripMenuItem_Click);
+            // 
+            // setAsDebuggerToolStripMenuItem
+            // 
+            this.setAsDebuggerToolStripMenuItem.Name = "setAsDebuggerToolStripMenuItem";
+            this.setAsDebuggerToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.setAsDebuggerToolStripMenuItem.Text = "Set As Debugger";
+            this.setAsDebuggerToolStripMenuItem.Click += new System.EventHandler(this.setAsDebuggerToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -81,6 +90,7 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addDebuggerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setAsDebuggerToolStripMenuItem;
 
 
     }

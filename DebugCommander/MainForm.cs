@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.Collections.ObjectModel;
+using Microsoft.Win32;
 
 namespace DebugCommander
 {
@@ -102,6 +103,27 @@ namespace DebugCommander
             Debugger debugger = new Debugger(displayname, executable, commandlinearguments);
             AddDebuggerButton(debugger, debuggers.Count);
             debuggers.Add(debugger);
+        }
+
+        private void setAsDebuggerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Assume if on 64-bit we are running as 64-bit
+            RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AeDebug");
+            if (key == null)
+                return; // oops
+
+            key.SetValue("Debugger", Application.ExecutablePath + " -p %ld -e %ld");
+            key.SetValue("Auto", "1");
+            key.Close();
+
+            // So we'll try and open the 32-bit view now
+            key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\AeDebug");
+            if (key == null)
+                return; // not a problem
+
+            key.SetValue("Debugger", Application.ExecutablePath + " -p %ld -e %ld");
+            key.SetValue("Auto", "1");
+            key.Close();
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Collections.ObjectModel;
 
 namespace DebugCommander
 {
@@ -16,6 +17,7 @@ namespace DebugCommander
     {
         string _processId = "";
         string _eventNumber = "";
+        DebuggerCollection debuggers;
 
         public MainForm()
         {
@@ -40,18 +42,36 @@ namespace DebugCommander
                 _processId = args[processIdIndex];
             if (eventNumberIndex < args.Length)
                 _eventNumber = args[eventNumberIndex];
+
+            debuggers = DebuggerCollection.Load("main.xml");
+
+            int index = 0;
+            foreach (Debugger debugger in debuggers)
+            {
+                Button btn = new Button();
+                
+                btn.Location = new System.Drawing.Point(13, 13*(index+1) + 5);
+                btn.Name = "btn" + debugger.DisplayName.Replace(" ", "_"); // really all whitespace
+                btn.Size = new System.Drawing.Size(75, 23);
+                btn.TabIndex = index;
+                btn.Text = debugger.DisplayName;
+                btn.UseVisualStyleBackColor = true;
+                btn.Click += new System.EventHandler(
+                    delegate(object sender, EventArgs e) {
+                        this.ButtonClick(sender, e, debugger);
+                    });
+                index++;
+                this.Controls.Add(btn);
+            }
+
         }
 
-        private void btnWinDbgx86_Click(object sender, EventArgs e)
+        private void ButtonClick(object sender, EventArgs e, Debugger debugger)
         {
-            Debugger windbg = new Debugger("WinDbg x86",
-                                           @"C:\Program Files (x86)\Debugging Tools For Windows (x86)\WinDbg.exe",
-                                           "-p %pid% -e %event%");
-
             this.Hide();
 
             // this will return when the debugger exits
-            windbg.StartDebugger(_processId, _eventNumber);
+            debugger.StartDebugger(_processId, _eventNumber);
 
             Application.Exit();
         }

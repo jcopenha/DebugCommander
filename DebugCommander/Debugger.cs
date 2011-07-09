@@ -3,19 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.Xml.Serialization;
 
 namespace DebugCommander
 {
-    class Debugger
+    [Serializable]
+    public class Debugger
     {
-        private string _Debugger;
+        private string _DebuggerExecutable;
         private string _CommandLineArguments;
         private string _DisplayName;
+
+        public string DebuggerExecutable { 
+            get { return _DebuggerExecutable; }
+            set { _DebuggerExecutable = value; }
+        }
+        public string CommandLineArguments { 
+            get { return _CommandLineArguments; }
+            set { _CommandLineArguments = value; }
+        }
+        public string DisplayName { 
+            get { return _DisplayName; }
+            set { _DisplayName = value; }
+        }
+
+        public Debugger()
+        {
+        }
 
         public Debugger(string DisplayName, string Debugger, string Arguments)
         {
             _DisplayName = DisplayName;
-            _Debugger = Debugger;
+            _DebuggerExecutable = Debugger;
             _CommandLineArguments = Arguments;
 
             if (!_CommandLineArguments.Contains("%pid%"))
@@ -30,7 +49,7 @@ namespace DebugCommander
             commandLine = commandLine.Replace("%pid%", pid);
             commandLine = commandLine.Replace("%event%", eventnumber);
 
-            ProcessStartInfo startInfo = new ProcessStartInfo(_Debugger);
+            ProcessStartInfo startInfo = new ProcessStartInfo(_DebuggerExecutable);
             startInfo.UseShellExecute = true;
             startInfo.Arguments = commandLine;
             Process p = Process.Start(startInfo);

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Xml.Serialization;
+using System.Runtime.InteropServices;
 
 namespace DebugCommander
 {
@@ -43,7 +44,7 @@ namespace DebugCommander
                 throw new ArgumentException("The command line arguments must contain a %event% value.");
         }
 
-        public bool StartDebugger(string pid, string eventnumber)
+        virtual public bool StartDebugger(string pid, string eventnumber)
         {
             string commandLine = _CommandLineArguments;
             commandLine = commandLine.Replace("%pid%", pid);
@@ -66,7 +67,26 @@ namespace DebugCommander
             
             return true;
         }
+    }
+    
+    
+    [Serializable]
+    public class DoNothingDebugger : Debugger
+    {
+        [DllImport("kernel32.dll")]
+        static extern bool SetEvent(IntPtr hEvent);
 
+        public DoNothingDebugger(string DisplayName, string Debugger, string Arguments) :
+            base(DisplayName, Debugger, Arguments)
+        {
+            
+        }
 
+        public override bool  StartDebugger(string pid, string eventnumber)
+        {
+            // tell WERFFault that we handled the debugging
+            SetEvent((IntPtr)Int32.Parse(eventnumber));
+            return true;
+        }
     }
 }

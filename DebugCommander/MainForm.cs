@@ -53,6 +53,9 @@ namespace DebugCommander
                 AddDebuggerButton(debugger, x++);
             }
 
+            DoNothingDebugger dnd = new DoNothingDebugger("Do Not Debug", "", "%pid% %event%");
+            AddDebuggerButton(dnd, x);
+
         }
 
         private void ButtonClick(object sender, EventArgs e, Debugger debugger)
@@ -83,9 +86,9 @@ namespace DebugCommander
         {
             Button btn = new Button();
 
-            btn.Location = new System.Drawing.Point(13, 23 * (index + 1) + 5);
+            btn.Location = new System.Drawing.Point(13, 35 * (index + 1) + 125);
             btn.Name = "btn" + debugger.DisplayName.Replace(" ", "_"); // really all whitespace
-            btn.Size = new System.Drawing.Size(75, 23);
+            btn.Size = new System.Drawing.Size(this.ClientRectangle.Width - 26, 23);
             btn.TabIndex = index;
             btn.Text = debugger.DisplayName;
             btn.UseVisualStyleBackColor = true;
@@ -94,6 +97,7 @@ namespace DebugCommander
                 {
                     this.ButtonClick(sender, e, debugger);
                 });
+            
             index++;
             this.Controls.Add(btn);
         }

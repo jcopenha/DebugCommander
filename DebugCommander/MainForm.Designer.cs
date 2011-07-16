@@ -32,7 +32,7 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setAsDebuggerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addDebuggerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.processInfoBox = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -69,20 +69,21 @@
             this.addDebuggerToolStripMenuItem.Text = "Add Debugger";
             this.addDebuggerToolStripMenuItem.Click += new System.EventHandler(this.addDebuggerToolStripMenuItem_Click);
             // 
-            // textBox1
+            // processInfoBox
             // 
-            this.textBox1.Location = new System.Drawing.Point(13, 28);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(447, 104);
-            this.textBox1.TabIndex = 1;
+            this.processInfoBox.Location = new System.Drawing.Point(13, 28);
+            this.processInfoBox.Multiline = true;
+            this.processInfoBox.Name = "processInfoBox";
+            this.processInfoBox.ReadOnly = true;
+            this.processInfoBox.Size = new System.Drawing.Size(447, 104);
+            this.processInfoBox.TabIndex = 1;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(472, 355);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.processInfoBox);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
@@ -102,7 +103,7 @@
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addDebuggerToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setAsDebuggerToolStripMenuItem;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox processInfoBox;
 
 
     }

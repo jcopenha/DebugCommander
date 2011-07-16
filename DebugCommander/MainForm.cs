@@ -19,6 +19,7 @@ namespace DebugCommander
         string _processId = "";
         string _eventNumber = "";
         DebuggerCollection debuggers;
+        bool debugged = false;
 
         public MainForm()
         {
@@ -45,6 +46,7 @@ namespace DebugCommander
             if (eventNumberIndex < args.Length)
                 _eventNumber = args[eventNumberIndex];
 
+            // all the debuggers the user has added
             debuggers = DebuggerCollection.Load("main.xml");
 
             x = 0;
@@ -53,8 +55,25 @@ namespace DebugCommander
                 AddDebuggerButton(debugger, x++);
             }
 
+            // an escape hatch in case they don't want to debug this
             DoNothingDebugger dnd = new DoNothingDebugger("Do Not Debug", "", "%pid% %event%");
             AddDebuggerButton(dnd, x);
+
+            // let's show some useful information about the process that crashed
+            // this is a start but I think I might have to poke at a lower level
+            // to get real information
+            Process CrashedProcess = Process.GetProcessById(Int32.Parse(_processId));
+
+            string info = String.Format("Process Name : {0}\r\n" +
+                                        "Path : {1}\r\n" +
+                                        "Command Line Options : {2}\r\n" +
+                                        "Working Directory : {3}\r\n",
+                                        CrashedProcess.ProcessName,
+                                        CrashedProcess.MainModule.FileName,
+                                        CrashedProcess.StartInfo.WorkingDirectory,
+                                        CrashedProcess.StartInfo.Arguments);
+
+            processInfoBox.Text = info;
 
         }
 
@@ -64,6 +83,7 @@ namespace DebugCommander
 
             // this will return when the debugger exits
             debugger.StartDebugger(_processId, _eventNumber);
+            debugged = true;
 
             Application.Exit();
         }
@@ -71,6 +91,11 @@ namespace DebugCommander
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             debuggers.Save("main.xml");
+            if (!debugged)
+            {
+                DoNothingDebugger dnd = new DoNothingDebugger("Do Not Debug", "", "%pid% %event%");
+                dnd.StartDebugger(_processId, _eventNumber);
+            }
         }
 
         private void addDebuggerToolStripMenuItem_Click(object sender, EventArgs e)

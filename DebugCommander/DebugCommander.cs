@@ -65,6 +65,9 @@ namespace DebugCommander
             taskDialogMain.Caption = "DebugCommander Debuggers";
             taskDialogMain.InstructionText = String.Format("The {0} process has crashed.  Choose a Debugger.", "<process name>");
             taskDialogMain.FooterText = "Some cool footer text, with hyperlinks even?";
+            taskDialogMain.Closing += new EventHandler<TaskDialogClosingEventArgs>(taskDialogMain_Closing);
+            taskDialogMain.FooterCheckBoxText = "Set DebugCommander as default debugger?";
+            taskDialogMain.FooterCheckBoxChecked = false; // need method for checking if we are already set.
 
             x = 0;
             foreach (Debugger debugger in debuggers)
@@ -80,6 +83,20 @@ namespace DebugCommander
             Application.Exit();
         }
 
+        void taskDialogMain_Closing(object sender, TaskDialogClosingEventArgs e)
+        {
+            debuggers.Save("main.xml");
+            if (!debugged)
+            {
+                DoNothingDebugger dnd = new DoNothingDebugger("Do Not Debug", "", "%pid% %event%");
+                dnd.StartDebugger(_processId, _eventNumber);
+            }
+            if (taskDialogMain.FooterCheckBoxChecked.Value) 
+            {
+                setAsDefaultDebugger();
+            }
+        }
+
 
         private void ButtonClick(object sender, EventArgs e, Debugger debugger)
         {
@@ -89,17 +106,6 @@ namespace DebugCommander
             debugger.StartDebugger(_processId, _eventNumber);
             debugged = true;
         }
-
-        //TODO: Where does this go?
-        //private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
-        //{
-        //    debuggers.Save("main.xml");
-        //    if (!debugged)
-        //    {
-        //        DoNothingDebugger dnd = new DoNothingDebugger("Do Not Debug", "", "%pid% %event%");
-        //        dnd.StartDebugger(_processId, _eventNumber);
-        //    }
-        //}
 
         private TaskDialogCommandLink CreateDebuggerLink(Debugger debugger, int index)
         {
@@ -122,25 +128,25 @@ namespace DebugCommander
         }
 
         //TODO: Checkbox?
-        private void setAsDebuggerToolStripMenuItem_Click(object sender, EventArgs e)
+        private void setAsDefaultDebugger()
         {
-            //// Assume if on 64-bit we are running as 64-bit
-            //RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AeDebug");
-            //if (key == null)
-            //    return; // oops
+            // Assume if on 64-bit we are running as 64-bit
+            RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\AeDebug");
+            if (key == null)
+                return; // oops
 
-            //key.SetValue("Debugger", Application.ExecutablePath + " -p %ld -e %ld");
-            //key.SetValue("Auto", "1");
-            //key.Close();
+            key.SetValue("Debugger", Application.ExecutablePath + " -p %ld -e %ld");
+            key.SetValue("Auto", "1");
+            key.Close();
 
-            //// So we'll try and open the 32-bit view now
-            //key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\AeDebug");
-            //if (key == null)
-            //    return; // not a problem
+            // So we'll try and open the 32-bit view now
+            key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\AeDebug");
+            if (key == null)
+                return; // not a problem
 
-            //key.SetValue("Debugger", Application.ExecutablePath + " -p %ld -e %ld");
-            //key.SetValue("Auto", "1");
-            //key.Close();
+            key.SetValue("Debugger", Application.ExecutablePath + " -p %ld -e %ld");
+            key.SetValue("Auto", "1");
+            key.Close();
         }
     }
 }

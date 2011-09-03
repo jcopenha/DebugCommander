@@ -69,6 +69,7 @@ namespace DebugCommander
             taskDialogMain.FooterCheckBoxChecked = false; // need method for checking if we are already set.
             taskDialogMain.HyperlinksEnabled = true;
             taskDialogMain.HyperlinkClick += new EventHandler<TaskDialogHyperlinkClickedEventArgs>(taskDialogMain_HyperlinkClick);
+            taskDialogMain.Cancelable = true;
 
             taskDialogMain.DetailsExpanded = false;
             taskDialogMain.DetailsExpandedLabel = "Hide details";
@@ -79,7 +80,8 @@ namespace DebugCommander
             x = 0;
             foreach (Debugger debugger in debuggers)
             {
-                taskDialogMain.Controls.Add(CreateDebuggerLink(debugger, 0));
+                taskDialogMain.Controls.Add(CreateDebuggerLink(debugger, x));
+                x++;
             }
 
             // an escape hatch in case they don't want to debug this
@@ -113,7 +115,6 @@ namespace DebugCommander
             }
         }
 
-
         private void ButtonClick(object sender, EventArgs e, Debugger debugger)
         {
             // This hides the TaskDialog even though we aren't done with it yet.
@@ -125,7 +126,7 @@ namespace DebugCommander
 
         private TaskDialogCommandLink CreateDebuggerLink(Debugger debugger, int index)
         {
-            TaskDialogCommandLink link = new TaskDialogCommandLink(index.ToString(), debugger.DisplayName,"What does htis look like");
+            TaskDialogCommandLink link = new TaskDialogCommandLink(index.ToString(), debugger.DisplayName);
             link.Click += new System.EventHandler(
                 delegate(object sender, EventArgs e)
                 {
@@ -134,8 +135,6 @@ namespace DebugCommander
             return link;
         }
 
-
-        // TODO: Need a way to add new debuggers still
         private void AddDebugger(string displayname, string executable, string commandlinearguments)
         {
             Debugger debugger = new Debugger(displayname, executable, commandlinearguments);

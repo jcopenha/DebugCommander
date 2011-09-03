@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Windows.Forms;
 
 
 namespace DebugCommander
@@ -19,7 +20,6 @@ namespace DebugCommander
 
         public DebugCommander()
         {
-            
             string[] args = Environment.GetCommandLineArgs();
 
             int processIdIndex = 0;
@@ -45,16 +45,6 @@ namespace DebugCommander
             // all the debuggers the user has added
             debuggers = DebuggerCollection.Load("main.xml");
 
-            x = 0;
-            foreach (Debugger debugger in debuggers)
-            {
-                //AddDebuggerButton(debugger, x++);
-            }
-
-            // an escape hatch in case they don't want to debug this
-            DoNothingDebugger dnd = new DoNothingDebugger("Do Not Debug", "", "%pid% %event%");
-            //AddDebuggerButton(dnd, x);
-            
             // let's show some useful information about the process that crashed
             // this is a start but I think I might have to poke at a lower level
             // to get real information
@@ -75,8 +65,6 @@ namespace DebugCommander
             taskDialogMain.Caption = "DebugCommander Debuggers";
             taskDialogMain.InstructionText = String.Format("The {0} process has crashed.  Choose a Debugger.", "<process name>");
             taskDialogMain.FooterText = "Some cool footer text, with hyperlinks even?";
-            //taskDialogMain.Cancelable = true;
-         
 
             x = 0;
             foreach (Debugger debugger in debuggers)
@@ -85,25 +73,24 @@ namespace DebugCommander
             }
 
             // an escape hatch in case they don't want to debug this
-            DoNothingDebugger dnd2 = new DoNothingDebugger("Do Not Debug", "", "%pid% %event%");
-            taskDialogMain.Controls.Add(CreateDebuggerLink(dnd2, 0));
+            DoNothingDebugger dnd = new DoNothingDebugger("Do Not Debug", "", "%pid% %event%");
+            taskDialogMain.Controls.Add(CreateDebuggerLink(dnd, 0));
 
             taskDialogMain.Show();
+            Application.Exit();
         }
 
 
         private void ButtonClick(object sender, EventArgs e, Debugger debugger)
         {
-            //this.Hide();
-
+            // This hides the TaskDialog even though we aren't done with it yet.
+            taskDialogMain.Close();
             // this will return when the debugger exits
             debugger.StartDebugger(_processId, _eventNumber);
             debugged = true;
-            taskDialogMain.Close();
-
-            //Application.Exit();
         }
 
+        //TODO: Where does this go?
         //private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         //{
         //    debuggers.Save("main.xml");
@@ -111,15 +98,6 @@ namespace DebugCommander
         //    {
         //        DoNothingDebugger dnd = new DoNothingDebugger("Do Not Debug", "", "%pid% %event%");
         //        dnd.StartDebugger(_processId, _eventNumber);
-        //    }
-        //}
-
-        //private void addDebuggerToolStripMenuItem_Click(object sender, EventArgs e)
-        //{
-        //    AddDebuggerForm form = new AddDebuggerForm();
-        //    if (form.ShowDialog() == DialogResult.OK)
-        //    {
-        //        AddDebugger(form.DisplayName, form.Executable, form.CommandLineArguments);
         //    }
         //}
 
@@ -134,26 +112,8 @@ namespace DebugCommander
             return link;
         }
 
-        //private void AddDebuggerButton(Debugger debugger, int index)
-        //{
-        //    Button btn = new Button();
 
-        //    btn.Location = new System.Drawing.Point(13, 35 * (index + 1) + 125);
-        //    btn.Name = "btn" + debugger.DisplayName.Replace(" ", "_"); // really all whitespace
-        //    btn.Size = new System.Drawing.Size(this.ClientRectangle.Width - 26, 23);
-        //    btn.TabIndex = index;
-        //    btn.Text = debugger.DisplayName;
-        //    btn.UseVisualStyleBackColor = true;
-        //    btn.Click += new System.EventHandler(
-        //        delegate(object sender, EventArgs e)
-        //        {
-        //            this.ButtonClick(sender, e, debugger);
-        //        });
-            
-        //    index++;
-        //    this.Controls.Add(btn);
-        //}
-
+        // TODO: Need a way to add new debuggers still
         private void AddDebugger(string displayname, string executable, string commandlinearguments)
         {
             Debugger debugger = new Debugger(displayname, executable, commandlinearguments);
@@ -161,6 +121,7 @@ namespace DebugCommander
             debuggers.Add(debugger);
         }
 
+        //TODO: Checkbox?
         private void setAsDebuggerToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //// Assume if on 64-bit we are running as 64-bit

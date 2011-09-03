@@ -6,6 +6,7 @@ using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 
 namespace DebugCommander
@@ -48,28 +49,32 @@ namespace DebugCommander
             // let's show some useful information about the process that crashed
             // this is a start but I think I might have to poke at a lower level
             // to get real information
-            //Process CrashedProcess = Process.GetProcessById(Int32.Parse(_processId));
+            Process CrashedProcess = Process.GetProcessById(Int32.Parse(_processId));
 
-            //string info = String.Format("Process Name : {0}\r\n" +
-            //                            "Path : {1}\r\n" +
-            //                            "Command Line Options : {2}\r\n" +
-            //                            "Working Directory : {3}\r\n",
-            //                            CrashedProcess.ProcessName,
-            //                            CrashedProcess.MainModule.FileName,
-            //                            CrashedProcess.StartInfo.WorkingDirectory,
-            //                            CrashedProcess.StartInfo.Arguments);
-
-            //processInfoBox.Text = "...";// info;
+            string info = String.Format("Process Name : {0}\r\n" +
+                                        "Path : {1}\r\n" +
+                                        "Command Line Options : {2}\r\n" +
+                                        "Working Directory : {3}\r\n",
+                                        CrashedProcess.ProcessName,
+                                        CrashedProcess.MainModule.FileName,
+                                        CrashedProcess.StartInfo.WorkingDirectory,
+                                        CrashedProcess.StartInfo.Arguments);
 
             taskDialogMain = new TaskDialog();
             taskDialogMain.Caption = "DebugCommander Debuggers";
-            taskDialogMain.InstructionText = String.Format("The {0} process has crashed.  Choose a Debugger.", "<process name>");
+            taskDialogMain.InstructionText = String.Format("The {0} process has crashed.  Choose a Debugger.", CrashedProcess.ProcessName);
             taskDialogMain.FooterText = "<a href=\"\">Add Debugger</a>";
             taskDialogMain.Closing += new EventHandler<TaskDialogClosingEventArgs>(taskDialogMain_Closing);
             taskDialogMain.FooterCheckBoxText = "Set DebugCommander as default debugger?";
             taskDialogMain.FooterCheckBoxChecked = false; // need method for checking if we are already set.
             taskDialogMain.HyperlinksEnabled = true;
             taskDialogMain.HyperlinkClick += new EventHandler<TaskDialogHyperlinkClickedEventArgs>(taskDialogMain_HyperlinkClick);
+
+            taskDialogMain.DetailsExpanded = false;
+            taskDialogMain.DetailsExpandedLabel = "Hide details";
+            taskDialogMain.DetailsCollapsedLabel = "Show details";
+            taskDialogMain.ExpansionMode = TaskDialogExpandedDetailsLocation.ExpandFooter;
+            taskDialogMain.DetailsExpandedText = info;
             
             x = 0;
             foreach (Debugger debugger in debuggers)

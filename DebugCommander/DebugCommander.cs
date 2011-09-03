@@ -23,6 +23,10 @@ namespace DebugCommander
         {
             string[] args = Environment.GetCommandLineArgs();
 
+            //TODO:  I need to have different behavior for:
+            // no options: Allow the user to launch any debugger, plus all the other stuff
+            // just pid: This is the context menu "Debug" case I believe
+
             int processIdIndex = 0;
             int eventNumberIndex = 0;
             int x = 0;
@@ -63,10 +67,14 @@ namespace DebugCommander
             taskDialogMain = new TaskDialog();
             taskDialogMain.Caption = "DebugCommander Debuggers";
             taskDialogMain.InstructionText = String.Format("The {0} process has crashed.  Choose a Debugger.", CrashedProcess.ProcessName);
+            
+            // TODO: This should probably be "Manage Debuggers" and allow you to edit
+            // the config for all the debuggers that are there along with adding/removing
             taskDialogMain.FooterText = "<a href=\"\">Add Debugger</a>";
+            
             taskDialogMain.Closing += new EventHandler<TaskDialogClosingEventArgs>(taskDialogMain_Closing);
             taskDialogMain.FooterCheckBoxText = "Set DebugCommander as default debugger?";
-            taskDialogMain.FooterCheckBoxChecked = false; // need method for checking if we are already set.
+            taskDialogMain.FooterCheckBoxChecked = false; // TODO: need method for checking if we are already set.
             taskDialogMain.HyperlinksEnabled = true;
             taskDialogMain.HyperlinkClick += new EventHandler<TaskDialogHyperlinkClickedEventArgs>(taskDialogMain_HyperlinkClick);
             taskDialogMain.Cancelable = true;

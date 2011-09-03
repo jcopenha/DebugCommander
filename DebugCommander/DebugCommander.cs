@@ -64,11 +64,13 @@ namespace DebugCommander
             taskDialogMain = new TaskDialog();
             taskDialogMain.Caption = "DebugCommander Debuggers";
             taskDialogMain.InstructionText = String.Format("The {0} process has crashed.  Choose a Debugger.", "<process name>");
-            taskDialogMain.FooterText = "Some cool footer text, with hyperlinks even?";
+            taskDialogMain.FooterText = "<a href=\"\">Add Debugger</a>";
             taskDialogMain.Closing += new EventHandler<TaskDialogClosingEventArgs>(taskDialogMain_Closing);
             taskDialogMain.FooterCheckBoxText = "Set DebugCommander as default debugger?";
             taskDialogMain.FooterCheckBoxChecked = false; // need method for checking if we are already set.
-
+            taskDialogMain.HyperlinksEnabled = true;
+            taskDialogMain.HyperlinkClick += new EventHandler<TaskDialogHyperlinkClickedEventArgs>(taskDialogMain_HyperlinkClick);
+            
             x = 0;
             foreach (Debugger debugger in debuggers)
             {
@@ -81,6 +83,15 @@ namespace DebugCommander
 
             taskDialogMain.Show();
             Application.Exit();
+        }
+
+        void taskDialogMain_HyperlinkClick(object sender, TaskDialogHyperlinkClickedEventArgs e)
+        {
+            AddDebuggerForm form = new AddDebuggerForm();
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                AddDebugger(form.DisplayName, form.Executable, form.CommandLineArguments);
+            }
         }
 
         void taskDialogMain_Closing(object sender, TaskDialogClosingEventArgs e)
@@ -123,11 +134,11 @@ namespace DebugCommander
         private void AddDebugger(string displayname, string executable, string commandlinearguments)
         {
             Debugger debugger = new Debugger(displayname, executable, commandlinearguments);
-            //AddDebuggerButton(debugger, debuggers.Count);
+            // can't do this, but it'll be there on the next round
+            //taskDialogMain.Controls.Add(CreateDebuggerLink(debugger, taskDialogMain.Controls.Count));
             debuggers.Add(debugger);
         }
 
-        //TODO: Checkbox?
         private void setAsDefaultDebugger()
         {
             // Assume if on 64-bit we are running as 64-bit

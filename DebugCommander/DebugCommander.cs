@@ -23,12 +23,8 @@ namespace DebugCommander
         {
             string[] args = Environment.GetCommandLineArgs();
 
-            //TODO:  I need to have different behavior for:
-            // no options: Allow the user to launch any debugger, plus all the other stuff
-            // just pid: This is the context menu "Debug" case I believe
-
-            int processIdIndex = 0;
-            int eventNumberIndex = 0;
+            int processIdIndex = -1;
+            int eventNumberIndex = -1;
             int x = 0;
             for (x = 0; x < args.Length; x++)
             {
@@ -42,9 +38,9 @@ namespace DebugCommander
                 }
             }
 
-            if (processIdIndex < args.Length)
+            if (processIdIndex != -1 && processIdIndex < args.Length)
                 _processId = args[processIdIndex];
-            if (eventNumberIndex < args.Length)
+            if (eventNumberIndex != -1 && eventNumberIndex < args.Length)
                 _eventNumber = args[eventNumberIndex];
 
             // all the debuggers the user has added
@@ -53,20 +49,29 @@ namespace DebugCommander
             // let's show some useful information about the process that crashed
             // this is a start but I think I might have to poke at a lower level
             // to get real information
-            Process CrashedProcess = Process.GetProcessById(Int32.Parse(_processId));
+            string info = "";
+            string ProcessName = "";
+            if (!string.IsNullOrEmpty(_processId))
+            {
+                Process CrashedProcess = Process.GetProcessById(Int32.Parse(_processId));
+                ProcessName = CrashedProcess.ProcessName;
 
-            string info = String.Format("Process Name : {0}\r\n" +
-                                        "Path : {1}\r\n" +
-                                        "Command Line Options : {2}\r\n" +
-                                        "Working Directory : {3}\r\n",
-                                        CrashedProcess.ProcessName,
-                                        CrashedProcess.MainModule.FileName,
-                                        CrashedProcess.StartInfo.WorkingDirectory,
-                                        CrashedProcess.StartInfo.Arguments);
+                info = String.Format("Process Name : {0}\r\n" +
+                                            "Path : {1}\r\n" +
+                                            "Command Line Options : {2}\r\n" +
+                                            "Working Directory : {3}\r\n",
+                                            CrashedProcess.ProcessName,
+                                            CrashedProcess.MainModule.FileName,
+                                            CrashedProcess.StartInfo.WorkingDirectory,
+                                            CrashedProcess.StartInfo.Arguments);
+            }
 
             taskDialogMain = new TaskDialog();
             taskDialogMain.Caption = "DebugCommander Debuggers";
-            taskDialogMain.InstructionText = String.Format("The {0} process has crashed.  Choose a Debugger.", CrashedProcess.ProcessName);
+            if(string.IsNullOrEmpty(ProcessName))
+                taskDialogMain.InstructionText = "Choose a Debugger";
+            else
+                taskDialogMain.InstructionText = String.Format("The {0} process has crashed.  Choose a Debugger.", ProcessName);
             
             // TODO: This should probably be "Manage Debuggers" and allow you to edit
             // the config for all the debuggers that are there along with adding/removing

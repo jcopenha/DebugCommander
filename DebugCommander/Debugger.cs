@@ -44,9 +44,34 @@ namespace DebugCommander
                 throw new ArgumentException("The command line arguments must contain a %event% value.");
         }
 
+        private string RemoveArgument(string commandline, string s)
+        {
+            
+            int count = s.Length;
+            int StopIndex = commandline.IndexOf(s);
+            if (commandline[StopIndex - 1] == ' ')
+            {
+                StopIndex -= 2;
+                count += 2;
+            }
+            count += 2; // for the space
+            int StartIndex = commandline.LastIndexOf(' ', StopIndex);
+            if (StartIndex == -1)
+                return ""; 
+            return commandline.Remove(StartIndex, count);
+        }
         virtual public bool StartDebugger(string pid, string eventnumber)
         {
             string commandLine = _CommandLineArguments;
+            // if eventnumber is empty
+            // search backwards from %even% to first space
+            // and remove all of that
+
+            if(string.IsNullOrEmpty(eventnumber))
+                commandLine = RemoveArgument(commandLine, "%event%");
+            if(string.IsNullOrEmpty(pid))
+                commandLine = RemoveArgument(commandLine, "%pid%");
+            
             commandLine = commandLine.Replace("%pid%", pid);
             commandLine = commandLine.Replace("%event%", eventnumber);
 
@@ -85,7 +110,10 @@ namespace DebugCommander
         public override bool  StartDebugger(string pid, string eventnumber)
         {
             // tell WERFFault that we handled the debugging
-            SetEvent((IntPtr)Int32.Parse(eventnumber));
+            Int32 value = 0;
+            if(Int32.TryParse(pid, out value))
+                SetEvent((IntPtr)value);
+            
             return true;
         }
     }
